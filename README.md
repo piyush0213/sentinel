@@ -159,8 +159,8 @@ During the Hackathon judging, you have two pitch options:
 
 ## 👥 Meet the Team
 **Finvasia Hackathon 2026**
-- *Piyush Prajapati* - Backend Developer
 - *Prachi Bhardwaj* - Frontend Developer
+- *Piyush Prajapati* - Backend Developer
 
 ## 📄 License
 [MIT License](LICENSE)
