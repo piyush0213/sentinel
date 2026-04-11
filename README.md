@@ -25,7 +25,8 @@ SENTINEL wraps around existing brokerage platforms (like Shoonya) as an intellig
 - **⚡ Live Risk Scoring**: Real-time composite risk score (0-100) combining loss recency, trade frequency, position sizing, time of day, and social media influence.
 - **📉 Portfolio Stress Tester**: Simulates how existing portfolios would behave under historical crashes (2008 Crisis, 2020 COVID Crash, flash crashes) and recommends hedges.
 - **🕵️ Misinformation Shield**: NLP-powered tip checker that analyzes forwarded tips for pump-and-dump signals, urgency manipulation, and SEBI compliance red flags.
-- **💬 AI Finance Coach**: Interactive chatbot powered by Anthropic's Claude that explains trading concepts simply (with Indian market context) but never provides specific buy/sell advice.
+- **💬 AI Finance Coach**: Interactive chatbot powered by OpenAI that explains trading concepts simply (with Indian market context) but never provides specific buy/sell advice.
+- **🌐 Browser Extension Layer**: A dynamic MV3 Chrome extension that acts as a real-time DOM interceptor. It natively listens for 'Buy/Sell' clicks on live broker websites (Groww, Shoonya, Kite) and directly injects the Sentinel intervention UI over the active DOM to prevent the trade.
 
 ---
 
@@ -37,9 +38,11 @@ graph TD
     
     subgraph "Frontend Layer"
         Frontend[⚛️ React Dashboard<br/>Vite + Tailwind + Recharts]
+        Extension[🧩 Chrome Extension<br/>Live Click Interceptor]
     end
 
     Frontend <-->|REST API / JSON| Backend
+    Extension <-->|Service Worker Fetch| Backend
     
     subgraph "SENTINEL Backend (Python/FastAPI)"
         Backend[⚡ FastAPI Gateway]
@@ -132,12 +135,25 @@ curl -X POST http://localhost:8000/api/stress-test \
 
 ---
 
+### 3. Chrome Extension Setup (Real-Time UI Blocking)
+If you wish to demo the real-time interceptor instead of the main React Dashboard:
+1. Open Google Chrome and go to `chrome://extensions/`.
+2. Turn on **Developer mode** in the top right.
+3. Click **Load unpacked** and select the `sentinel/extension` folder.
+4. Open a broker site (e.g., `groww.in/options/nifty/...`). Keep your local FastAPI server running.
+5. Watch the magic happen when you click a "Buy" button!
+
+---
+
 ## 🎬 Live Demo Instructions
-During the Hackathon judging, click the **"Live Demo Mode"** button in the sidebar. This triggers a 3-step sequenced story:
-1. **Safe State:** Dashboard loads with a low risk score.
-2. **First Loss:** A normal trade registers a loss. Risk score increments.
-3. **Revenge Trade:** 3 seconds later, a massive trade is placed. The AI intercepts it, triggers the breathing exercise overlay, and shows the user their historical win rate for Revenge Trades (~12%).
-4. **Resolution:** The user cancels the trade, confetti drops, and the dashboard tracks "₹6,400 saved from emotional intervention."
+During the Hackathon judging, you have two pitch options:
+
+**1. The Application Pitch:** Click the **"Live Demo Mode"** button in the React dashboard sidebar. This triggers a sequenced story:
+* **Safe State:** Dashboard loads with a low risk score.
+* **First Loss:** A normal trade registers a loss. Risk score increments.
+* **Revenge Trade:** 3 seconds later, a massive trade is placed. The AI intercepts it, triggers the breathing exercise overlay, and shows the user their historical win rate for Revenge Trades (~12%).
+
+**2. The Native Pitch:** Load the **Chrome Extension**. Tell the judges that Finvasia could run this as a native DOM wrapper. Go to `groww.in` and click "Buy". The extension will violently blur the UI and blast the Cool-Down sequence natively onto the live web page!
 
 ---
 
