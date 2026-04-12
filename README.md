@@ -9,46 +9,46 @@
 
 > Built for **Finvasia Innovation Hackathon 2026** at Chitkara University
 
-## 🚨 The Problem
+##  Problem Statement 
 Indian retail options traders (F&O) face massive losses, with 90% of individual traders losing money according to SEBI. The root cause usually isn't a lack of technical knowledge, but **emotional and behavioral failures** during live trading. 
 
 When traders experience a loss, they are prone to revenge trading, FOMO, panic selling, and overtrading. Traditional trading platforms execute these harmful orders without friction, leading to massive capital destruction. 
 
-## 🛡️ The Solution: SENTINEL
+##  The Solution: SENTINEL
 **"Don't block trades. Give traders a mirror."**
 
 SENTINEL wraps around existing brokerage platforms (like Shoonya) as an intelligent, real-time protection layer. Instead of outright blocking users, SENTINEL analyzes every action, detects dangerous behavioral patterns, and intervenes with psychological circuit breakers before the mistake is made.
 
-### 🌟 Key Features
-- **🧠 Behavioral ML Model**: A Random Forest Classifier trained to detect 7 distinct emotional trading patterns (revenge trading, FOMO, overtrading, late-night trading, panic selling, herd trading).
-- **⏱️ Psychological Circuit Breaker**: The "CoolDown Card" intercepts dangerous trades with a 60-second breathing exercise and confronts the user with their own historical loss rates for that specific pattern.
-- **⚡ Live Risk Scoring**: Real-time composite risk score (0-100) combining loss recency, trade frequency, position sizing, time of day, and social media influence.
-- **📉 Portfolio Stress Tester**: Simulates how existing portfolios would behave under historical crashes (2008 Crisis, 2020 COVID Crash, flash crashes) and recommends hedges.
-- **🕵️ Misinformation Shield**: NLP-powered tip checker that analyzes forwarded tips for pump-and-dump signals, urgency manipulation, and SEBI compliance red flags.
-- **💬 AI Finance Coach**: Interactive chatbot powered by OpenAI that explains trading concepts simply (with Indian market context) but never provides specific buy/sell advice.
-- **🌐 Browser Extension Layer**: A dynamic MV3 Chrome extension that acts as a real-time DOM interceptor. It natively listens for 'Buy/Sell' clicks on live broker websites (Groww, Shoonya, Kite) and directly injects the Sentinel intervention UI over the active DOM to prevent the trade.
+###  Key Features
+- ** Behavioral ML Model**: A Random Forest Classifier trained to detect 7 distinct emotional trading patterns (revenge trading, FOMO, overtrading, late-night trading, panic selling, herd trading).
+- ** Psychological Circuit Breaker**: The "CoolDown Card" intercepts dangerous trades with a 60-second breathing exercise and confronts the user with their own historical loss rates for that specific pattern.
+- ** Live Risk Scoring**: Real-time composite risk score (0-100) combining loss recency, trade frequency, position sizing, time of day, and social media influence.
+- ** Portfolio Stress Tester**: Simulates how existing portfolios would behave under historical crashes (2008 Crisis, 2020 COVID Crash, flash crashes) and recommends hedges.
+- ** Misinformation Shield**: NLP-powered tip checker that analyzes forwarded tips for pump-and-dump signals, urgency manipulation, and SEBI compliance red flags.
+- ** AI Finance Coach**: Interactive chatbot powered by OpenAI that explains trading concepts simply (with Indian market context) but never provides specific buy/sell advice.
+- ** Browser Extension Layer**: A dynamic MV3 Chrome extension that acts as a real-time DOM interceptor. It natively listens for 'Buy/Sell' clicks on live broker websites (Groww, Shoonya, Kite) and directly injects the Sentinel intervention UI over the active DOM to prevent the trade.
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```mermaid
 graph TD
-    User([🧑‍💻 Retail Trader]) <-->|Interacts| Frontend
+    User([ Retail Trader]) <-->|Interacts| Frontend
     
     subgraph "Frontend Layer"
-        Frontend[⚛️ React Dashboard<br/>Vite + Tailwind + Recharts]
-        Extension[🧩 Chrome Extension<br/>Live Click Interceptor]
+        Frontend[ React Dashboard<br/>Vite + Tailwind + Recharts]
+        Extension[ Chrome Extension<br/>Live Click Interceptor]
     end
 
     Frontend <-->|REST API / JSON| Backend
     Extension <-->|Service Worker Fetch| Backend
     
     subgraph "SENTINEL Backend (Python/FastAPI)"
-        Backend[⚡ FastAPI Gateway]
-        Backend --> MLEngine[🧠 ML Engine<br/>RandomForest Classifier]
-        Backend --> RiskEngine[🚦 Risk Engine<br/>Composite Scoring]
-        Backend --> Misinfo[🕵️ Misinfo Shield<br/>NLP & Heuristics]
+        Backend[ FastAPI Gateway]
+        Backend --> MLEngine[ ML Engine<br/>RandomForest Classifier]
+        Backend --> RiskEngine[ Risk Engine<br/>Composite Scoring]
+        Backend --> Misinfo[Misinfo Shield<br/>NLP & Heuristics]
     end
     
     Backend <--> Data[(Brokerage Data<br/>Shoonya API)]
@@ -56,7 +56,7 @@ graph TD
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 | Tier | Technologies |
 |------|--------------|
 | **Backend** | Python 3.11, FastAPI, Uvicorn |
@@ -66,7 +66,7 @@ graph TD
 
 ---
 
-## 🚀 Setup Instructions
+##  Setup Instructions
 
 ### Prerequisites
 - Node.js 20+
@@ -145,7 +145,7 @@ If you wish to demo the real-time interceptor instead of the main React Dashboar
 
 ---
 
-## 🎬 Live Demo Instructions
+##  Live Demo Instructions
 During the Hackathon judging, you have two pitch options:
 
 **1. The Application Pitch:** Click the **"Live Demo Mode"** button in the React dashboard sidebar. This triggers a sequenced story:
@@ -162,5 +162,5 @@ During the Hackathon judging, you have two pitch options:
 - *Prachi Bhardwaj* - Frontend Developer
 - *Piyush Prajapati* - Backend Developer
 
-## 📄 License
+##  License
 [MIT License](LICENSE)
