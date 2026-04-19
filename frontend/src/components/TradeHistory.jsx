@@ -8,13 +8,13 @@ import { X, Clock, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { AppContext } from '../App';
 
 const PATTERN_LABELS = {
-  normal: { label: 'Normal', color: '#10B981', bg: 'rgba(16,185,129,0.15)' },
-  revenge_trade: { label: 'Revenge Trade', color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
-  fomo_trade: { label: 'FOMO', color: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
-  overtrading: { label: 'Overtrading', color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
-  late_night_trade: { label: 'Late Night', color: '#FBBF24', bg: 'rgba(251,191,36,0.15)' },
-  panic_sell: { label: 'Panic Sell', color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
-  herd_trade: { label: 'Tip-Based', color: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
+  normal: { label: 'Normal', color: '#00D26A', bg: 'rgba(0,210,106,0.12)' },
+  revenge_trade: { label: 'Revenge Trade', color: '#FF3B3B', bg: 'rgba(255,59,59,0.12)' },
+  fomo_trade: { label: 'FOMO', color: '#FFB020', bg: 'rgba(255,176,32,0.12)' },
+  overtrading: { label: 'Overtrading', color: '#FF3B3B', bg: 'rgba(255,59,59,0.12)' },
+  late_night_trade: { label: 'Late Night', color: '#FFB020', bg: 'rgba(255,176,32,0.12)' },
+  panic_sell: { label: 'Panic Sell', color: '#FF3B3B', bg: 'rgba(255,59,59,0.12)' },
+  herd_trade: { label: 'Tip-Based', color: '#FFB020', bg: 'rgba(255,176,32,0.12)' },
 };
 
 const PATTERN_EXPLANATIONS = {
@@ -50,8 +50,8 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
     <>
       <div className="glass-card overflow-hidden">
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-sm font-semibold text-slate-200 tracking-wide">Recent Trades</h3>
-          <span className="text-xs text-slate-500">{displayTrades.length} trades</span>
+          <h3 className="text-sm font-semibold text-[#F0F0F5] tracking-wide">Recent Trades</h3>
+          <span className="text-[10px] text-[#5A5A6E] font-semibold tracking-wider uppercase">{displayTrades.length} trades</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -72,32 +72,37 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
                 const isProfit = trade.pnl >= 0;
                 return (
                   <tr key={trade.trade_id || i} onClick={() => setSelectedTrade(trade)}
-                    className="fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
+                    className="fade-in-up" style={{ animationDelay: `${i * 40}ms` }}>
                     <td>
                       <div className="flex flex-col">
-                        <span className="text-slate-300 font-medium">{formatTime(trade.timestamp)}</span>
-                        <span className="text-[10px] text-slate-500">{formatDate(trade.timestamp)}</span>
+                        <span className="text-[#F0F0F5] font-medium font-mono text-xs">{formatTime(trade.timestamp)}</span>
+                        <span className="text-[10px] text-[#5A5A6E]">{formatDate(trade.timestamp)}</span>
                       </div>
                     </td>
                     <td>
-                      <span className="text-sm font-semibold text-slate-200">{trade.symbol}</span>
+                      <span className="text-sm font-semibold text-[#F0F0F5]">{trade.symbol}</span>
                     </td>
                     <td>
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${trade.trade_type === 'BUY' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider ${
+                        trade.trade_type === 'BUY'
+                          ? 'bg-[#00D26A] text-[#0A0A0F]'
+                          : 'bg-[#FF3B3B] text-white'
+                      }`}>
                         {trade.trade_type}
                       </span>
                     </td>
-                    <td className="text-slate-400">{trade.quantity}</td>
+                    <td className="text-[#8B8B9E] font-mono text-xs">{trade.quantity}</td>
                     <td>
-                      <div className="flex items-center gap-1">
-                        {isProfit ? <TrendingUp size={12} className="text-emerald-400" /> : <TrendingDown size={12} className="text-red-400" />}
-                        <span className={`font-semibold ${isProfit ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <div className="flex items-center gap-1.5">
+                        {isProfit ? <TrendingUp size={12} className="text-[#00D26A]" /> : <TrendingDown size={12} className="text-[#FF3B3B]" />}
+                        <span className={`font-bold font-mono text-sm ${isProfit ? 'text-[#00D26A]' : 'text-[#FF3B3B]'}`}>
                           {isProfit ? '+' : ''}₹{Math.abs(trade.pnl).toLocaleString('en-IN')}
                         </span>
                       </div>
                     </td>
                     <td>
                       <span className="emotion-pill" style={{ color: pattern.color, background: pattern.bg }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: pattern.color }} />
                         {pattern.label}
                       </span>
                     </td>
@@ -109,7 +114,7 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
         </div>
 
         {displayTrades.length === 0 && (
-          <div className="text-center py-8 text-slate-500 text-sm">
+          <div className="text-center py-8 text-[#5A5A6E] text-sm">
             No trades to display
           </div>
         )}
@@ -118,26 +123,26 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
       {/* ── Trade Detail Drawer ── */}
       {selectedTrade && (
         <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelectedTrade(null)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md bg-[#13131A] border-l border-[#2A2A3A] h-full overflow-y-auto p-6 fade-in-up"
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative w-full max-w-md bg-[#0A0A0F] border-l border-[#1E1E2A] h-full overflow-y-auto p-6 slide-in-right"
             onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-white">Trade Details</h3>
-              <button onClick={() => setSelectedTrade(null)} className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition">
-                <X size={20} />
+              <button onClick={() => setSelectedTrade(null)} className="p-1.5 rounded-lg hover:bg-white/5 text-[#5A5A6E] hover:text-white transition">
+                <X size={18} />
               </button>
             </div>
 
             {/* Trade info */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-[#1A1A24] border border-[#2A2A3A]">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[#111118] border border-[#1E1E2A]">
                 <div>
                   <p className="text-lg font-bold text-white">{selectedTrade.symbol}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[#5A5A6E]">
                     {selectedTrade.trade_type} · {selectedTrade.quantity} qty · {formatTime(selectedTrade.timestamp)}
                   </p>
                 </div>
-                <div className={`text-xl font-bold ${selectedTrade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                <div className={`text-xl font-black font-mono ${selectedTrade.pnl >= 0 ? 'text-[#00D26A]' : 'text-[#FF3B3B]'}`}>
                   {selectedTrade.pnl >= 0 ? '+' : ''}₹{Math.abs(selectedTrade.pnl).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -146,12 +151,12 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
               {(() => {
                 const p = PATTERN_LABELS[selectedTrade.behavioral_pattern] || PATTERN_LABELS.normal;
                 return (
-                  <div className="p-4 rounded-xl border" style={{ borderColor: p.color + '30', background: p.bg }}>
+                  <div className="p-4 rounded-xl border" style={{ borderColor: p.color + '20', background: p.bg }}>
                     <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle size={16} style={{ color: p.color }} />
+                      <AlertCircle size={15} style={{ color: p.color }} />
                       <span className="font-bold text-sm" style={{ color: p.color }}>{p.label}</span>
                     </div>
-                    <p className="text-sm text-slate-300 leading-relaxed">
+                    <p className="text-sm text-[#8B8B9E] leading-relaxed">
                       {PATTERN_EXPLANATIONS[selectedTrade.behavioral_pattern] || PATTERN_EXPLANATIONS.normal}
                     </p>
                   </div>
@@ -159,23 +164,21 @@ export default function TradeHistory({ trades: propTrades, limit = 10 }) {
               })()}
 
               {/* Trade metadata */}
-              <div className="space-y-3 p-4 rounded-xl bg-[#1A1A24] border border-[#2A2A3A]">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Trade ID</span>
-                  <span className="text-slate-300 font-mono">{selectedTrade.trade_id}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Outcome</span>
-                  <span className={selectedTrade.outcome === 'WIN' ? 'text-emerald-400' : 'text-red-400'}>{selectedTrade.outcome}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Entry Price</span>
-                  <span className="text-slate-300">₹{(selectedTrade.entry_price || 0).toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Exit Price</span>
-                  <span className="text-slate-300">₹{(selectedTrade.exit_price || 0).toLocaleString('en-IN')}</span>
-                </div>
+              <div className="space-y-0 rounded-xl bg-[#111118] border border-[#1E1E2A] overflow-hidden">
+                {[
+                  { label: 'Trade ID', value: selectedTrade.trade_id, mono: true },
+                  { label: 'Outcome', value: selectedTrade.outcome, color: selectedTrade.outcome === 'WIN' ? '#00D26A' : '#FF3B3B' },
+                  { label: 'Entry Price', value: `₹${(selectedTrade.entry_price || 0).toLocaleString('en-IN')}` },
+                  { label: 'Exit Price', value: `₹${(selectedTrade.exit_price || 0).toLocaleString('en-IN')}` },
+                ].map((row, i) => (
+                  <div key={i} className="flex justify-between text-sm px-4 py-3 border-b border-[#1E1E2A] last:border-0">
+                    <span className="text-[#5A5A6E]">{row.label}</span>
+                    <span className={`${row.mono ? 'font-mono text-xs' : ''} ${row.color ? '' : 'text-[#F0F0F5]'}`}
+                      style={row.color ? { color: row.color } : {}}>
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

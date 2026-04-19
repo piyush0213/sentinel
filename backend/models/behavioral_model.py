@@ -85,10 +85,10 @@ def train_model(force_retrain: bool = False) -> dict:
 
     # Skip if model already exists and no force retrain
     if os.path.exists(MODEL_PATH) and not force_retrain:
-        print("✅ Model already trained. Use force_retrain=True to retrain.")
+        print("Model already trained. Use force_retrain=True to retrain.")
         return {"status": "already_trained"}
 
-    print("🧠 Training behavioral model...")
+    print("Training behavioral model...")
     df = generate_mock_trades()
 
     # Prepare features
@@ -124,13 +124,13 @@ def train_model(force_retrain: bool = False) -> dict:
     accuracy = accuracy_score(y_test, y_pred)
     report = classification_report(y_test, y_pred, target_names=le.classes_)
 
-    print(f"\n✅ Model Accuracy: {accuracy:.2%}")
+    print(f"\nModel Accuracy: {accuracy:.2%}")
     print(f"\n{report}")
 
     # Save model and encoder
     joblib.dump(model, MODEL_PATH)
     joblib.dump(le, ENCODER_PATH)
-    print(f"💾 Model saved → {MODEL_PATH}")
+    print(f"Model saved -> {MODEL_PATH}")
 
     return {
         "status": "trained",

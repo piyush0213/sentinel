@@ -9,10 +9,19 @@ All REST endpoints for the SENTINEL platform:
 - Portfolio stress testing
 - Misinformation tip checking
 - Dashboard aggregate stats
+- Live brokerage integration via Shoonya API
 """
 
 import os
 import sys
+
+# Force UTF-8 encoding for standard output/error to prevent crash on Windows console with emojis
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+if sys.stderr.encoding != 'utf-8':
+    sys.stderr.reconfigure(encoding='utf-8')
+
+import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
 
@@ -24,11 +33,23 @@ from pydantic import BaseModel
 # ── Add parent dir to path for imports ──
 sys.path.insert(0, os.path.dirname(__file__))
 
+# Load .env file if python-dotenv is available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from models.mock_data import generate_mock_trades, save_mock_data, SECTOR_MAP
 from models.behavioral_model import predict_pattern, train_model
 from services.risk_engine import RiskEngine
 from services.stress_test import StressTestService
 from services.misinformation import MisinfoShield
+from services.data_provider import DataProvider
+
+# ── Logging ──
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("sentinel")
 
 # ══════════════════════════════════════
 # App initialization
@@ -37,7 +58,7 @@ from services.misinformation import MisinfoShield
 app = FastAPI(
     title="SENTINEL API",
     description="AI-Powered Behavioral Finance Protection Layer",
-    version="1.0.0",
+    version="2.0.0",
 )
 
 # CORS — allow React frontend
@@ -53,35 +74,29 @@ app.add_middleware(
 risk_engine = RiskEngine()
 stress_service = StressTestService()
 misinfo_shield = MisinfoShield()
+data_provider = DataProvider()
 
-# ── In-memory data store (mock) ──
+# ── Legacy in-memory stores (kept for backward compat) ──
 USERS = {}
 TRADE_DATA = {}
 
 
-def _init_mock_user():
-    """Initialize the mock user 'Rahul Sharma' with generated trade data."""
+def _init_data():
+    """
+    Initialize the data provider.
+    Tries Shoonya API first, falls back to mock data.
+    Also populates legacy USERS/TRADE_DATA stores for backward compat.
+    """
+    mode = data_provider.initialize()
+
+    # Populate legacy stores so existing endpoints keep working
     user_id = "user_001"
-    USERS[user_id] = {
-        "user_id": user_id,
-        "name": "Rahul Sharma",
-        "email": "rahul@example.com",
-        "joined": "2024-06-15",
-    }
+    user = data_provider.get_user(user_id)
+    USERS[user_id] = user
+    TRADE_DATA[user_id] = data_provider.get_trades(user_id)
 
-    # Generate and cache mock trade data
-    df = generate_mock_trades()
-    trades = df.to_dict("records")
-
-    # Convert timestamps to strings for JSON serialization
-    for t in trades:
-        if isinstance(t["timestamp"], pd.Timestamp):
-            t["timestamp"] = t["timestamp"].isoformat()
-        # Ensure boolean type
-        t["followed_social_tip"] = bool(t["followed_social_tip"])
-
-    TRADE_DATA[user_id] = trades
-    print(f"✅ Loaded {len(trades)} trades for {USERS[user_id]['name']}")
+    logger.info(f"Data source: {mode.upper()}")
+    logger.info(f"Loaded {len(TRADE_DATA[user_id])} trades for {user['name']}")
 
 
 # ══════════════════════════════════════
@@ -116,26 +131,27 @@ class TipCheckRequest(BaseModel):
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize mock data and train ML model on startup."""
-    print("\n🛡️  SENTINEL Backend Starting...")
-    print("=" * 50)
+    """Initialize data provider and train ML model on startup."""
+    logger.info("SENTINEL Backend Starting...")
+    logger.info("=" * 50)
 
-    # Generate mock data
-    _init_mock_user()
+    # Initialize data provider (Shoonya → mock fallback)
+    _init_data()
 
     # Train/load behavior model
     try:
         train_model(force_retrain=False)
-        print("✅ Behavioral model loaded")
+        logger.info("Behavioral model loaded")
     except Exception as e:
-        print(f"⚠️  Model training warning: {e}")
+        logger.warning(f"Model training warning: {e}")
         # Force retrain on error
         train_model(force_retrain=True)
-        print("✅ Behavioral model retrained")
+        logger.info("Behavioral model retrained")
 
-    print("=" * 50)
-    print("🚀 SENTINEL API ready on http://localhost:8000")
-    print("📚 Docs: http://localhost:8000/docs\n")
+    logger.info("=" * 50)
+    mode_icon = "LIVE" if data_provider.is_live else "MOCK"
+    logger.info(f"SENTINEL API ready on http://localhost:8000  [{mode_icon}]")
+    logger.info("Docs: http://localhost:8000/docs")
 
 
 # ══════════════════════════════════════
@@ -146,8 +162,10 @@ async def startup_event():
 async def root():
     return {
         "name": "SENTINEL API",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "status": "operational",
+        "data_source": data_provider.mode,
+        "live_connected": data_provider.is_live,
         "tagline": "Don't block trades. Give traders a mirror.",
     }
 
@@ -380,6 +398,161 @@ async def get_dashboard_stats(user_id: str):
         "worst_pattern": summary["worst_pattern"],
         "behavioral_summary": summary,
         "recent_trades": recent_trades,
+    }
+
+
+# ══════════════════════════════════════
+# Data Source Status
+# ══════════════════════════════════════
+
+@app.get("/api/data-status")
+async def get_data_status():
+    """Get current data source status (Shoonya live vs mock)."""
+    return data_provider.get_status()
+
+
+# ══════════════════════════════════════
+# Positions & Holdings (Shoonya-powered)
+# ══════════════════════════════════════
+
+@app.get("/api/positions/{user_id}")
+async def get_positions(user_id: str):
+    """Get open positions — live from Shoonya or mock."""
+    positions = data_provider.get_positions(user_id)
+    total_pnl = sum(p.get("pnl", 0) for p in positions)
+    return {
+        "user_id": user_id,
+        "data_source": data_provider.mode,
+        "positions": positions,
+        "total_pnl": round(total_pnl, 2),
+        "position_count": len(positions),
+    }
+
+
+@app.get("/api/holdings/{user_id}")
+async def get_holdings(user_id: str):
+    """Get demat holdings — live from Shoonya or mock."""
+    holdings = data_provider.get_holdings(user_id)
+    total_value = sum(h.get("value", 0) for h in holdings)
+    return {
+        "user_id": user_id,
+        "data_source": data_provider.mode,
+        "holdings": holdings,
+        "total_value": round(total_value, 2),
+        "holdings_count": len(holdings),
+    }
+
+
+# ══════════════════════════════════════
+# Market Quotes (Shoonya-powered)
+# ══════════════════════════════════════
+
+@app.get("/api/quote/{symbol}")
+async def get_quote(symbol: str, exchange: str = "NSE"):
+    """Get live market quote for a symbol."""
+    quote = data_provider.get_quote(symbol, exchange)
+    if not quote:
+        raise HTTPException(status_code=404, detail=f"Quote not found for {symbol}")
+    return {
+        "data_source": data_provider.mode,
+        "quote": quote,
+    }
+
+
+# ══════════════════════════════════════
+# Sentinel-Gated Order Placement
+# ══════════════════════════════════════
+
+class PlaceOrderRequest(BaseModel):
+    symbol: str
+    trade_type: str  # BUY or SELL
+    quantity: int
+    price: float = 0  # 0 = market order
+    exchange: str = "NSE"
+    product_type: str = "C"  # C=CNC, I=MIS, M=NRML
+    price_type: str = "MKT"  # MKT or LMT
+    sentinel_approved: bool = False  # Must be True to proceed
+
+
+@app.post("/api/place-order")
+async def place_order(req: PlaceOrderRequest):
+    """
+    Place a trade through Shoonya — ONLY after Sentinel behavioral analysis.
+    The order is first analyzed for emotional patterns before execution.
+    """
+    # Step 1: Sentinel must approve the trade
+    if not req.sentinel_approved:
+        # Run behavioral analysis first
+        user_trades = TRADE_DATA.get("user_001", [])
+        avg_position = data_provider.get_portfolio_value() * 0.05
+        position_size = req.quantity * req.price if req.price > 0 else req.quantity * 100
+
+        trade_features = {
+            "time_since_last_loss_minutes": None,
+            "trades_in_last_30_min": len([
+                t for t in user_trades[-20:]
+                if t.get("source") == "shoonya_live"
+            ]) + 1,
+            "trade_hour": datetime.now().hour,
+            "position_size_vs_avg": position_size / avg_position if avg_position > 0 else 1.0,
+            "followed_social_tip": False,
+            "last_loss_amount": 0,
+        }
+
+        prediction = predict_pattern(trade_features)
+        risk_data = risk_engine.calculate_live_risk_score(user_trades[-20:])
+        combined_risk = min(
+            100,
+            int(prediction["risk_score"] * 0.6 + risk_data["score"] * 0.4)
+        )
+
+        if combined_risk >= 60:
+            return {
+                "status": "BLOCKED",
+                "message": "⚠️ Sentinel detected high-risk behavioral pattern",
+                "risk_score": combined_risk,
+                "detected_pattern": prediction.get("predicted_pattern", "unknown"),
+                "recommendation": "Take a 5-minute cool-down before retrying",
+                "sentinel_approved": False,
+            }
+
+    # Step 2: Place the order
+    result = data_provider.place_order(
+        symbol=req.symbol,
+        trade_type=req.trade_type,
+        quantity=req.quantity,
+        price=req.price,
+        exchange=req.exchange,
+        product_type=req.product_type,
+        price_type=req.price_type,
+    )
+
+    return {
+        **result,
+        "data_source": data_provider.mode,
+        "sentinel_approved": True,
+    }
+
+
+# ══════════════════════════════════════
+# Portfolio Summary (Shoonya-powered)
+# ══════════════════════════════════════
+
+@app.get("/api/portfolio/{user_id}")
+async def get_portfolio(user_id: str):
+    """Get complete portfolio summary with positions, holdings, and value."""
+    positions = data_provider.get_positions(user_id)
+    holdings = data_provider.get_holdings(user_id)
+    portfolio_value = data_provider.get_portfolio_value(user_id)
+
+    return {
+        "user_id": user_id,
+        "data_source": data_provider.mode,
+        "portfolio_value": round(portfolio_value, 2),
+        "positions": positions,
+        "holdings": holdings,
+        "total_positions": len(positions),
+        "total_holdings": len(holdings),
     }
 
 

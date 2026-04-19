@@ -59,12 +59,12 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
   const needleX = cx + needleLength * Math.cos(scoreAngle);
   const needleY = cy + needleLength * Math.sin(scoreAngle);
 
-  // Color based on score
+  // Color based on score — Shoonya palette
   const getColor = (s) => {
-    if (s < 30) return '#10B981';
-    if (s < 60) return '#F59E0B';
-    if (s < 80) return '#EF4444';
-    return '#DC2626';
+    if (s < 30) return '#00D26A';
+    if (s < 60) return '#FFB020';
+    if (s < 80) return '#FF3B3B';
+    return '#DC2020';
   };
 
   const color = getColor(animatedScore);
@@ -97,7 +97,7 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
         <path
           d={describeArc(startAngle, endAngle)}
           fill="none"
-          stroke="#1A1A24"
+          stroke="#151520"
           strokeWidth={strokeWidth + 4}
           strokeLinecap="round"
         />
@@ -107,28 +107,28 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
         <path
           d={describeArc(startAngle, startAngle + 0.3 * Math.PI)}
           fill="none"
-          stroke="#10B981"
+          stroke="#00D26A"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          opacity={0.2}
+          opacity={0.15}
         />
         {/* Amber zone (30-60) */}
         <path
           d={describeArc(startAngle + 0.3 * Math.PI, startAngle + 0.6 * Math.PI)}
           fill="none"
-          stroke="#F59E0B"
+          stroke="#FFB020"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          opacity={0.2}
+          opacity={0.15}
         />
         {/* Red zone (60-100) */}
         <path
           d={describeArc(startAngle + 0.6 * Math.PI, endAngle)}
           fill="none"
-          stroke="#EF4444"
+          stroke="#FF3B3B"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          opacity={0.2}
+          opacity={0.15}
         />
 
         {/* Active arc */}
@@ -139,7 +139,7 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           style={{
-            filter: `drop-shadow(0 0 8px ${color}40)`,
+            filter: `drop-shadow(0 0 10px ${color}50)`,
             transition: 'stroke 0.5s ease',
           }}
         />
@@ -158,9 +158,9 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
           const ly = cy + labelR * Math.sin(angle);
           return (
             <g key={tick}>
-              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3A3A4A" strokeWidth={2} />
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#2A2A3A" strokeWidth={2} />
               <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                fill="#64748B" fontSize="10" fontWeight="500">
+                fill="#5A5A6E" fontSize="10" fontWeight="600" fontFamily="'JetBrains Mono', monospace">
                 {tick}
               </text>
             </g>
@@ -173,21 +173,21 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
           stroke={color}
           strokeWidth={3}
           strokeLinecap="round"
-          style={{ transition: 'all 0.3s ease', filter: `drop-shadow(0 0 4px ${color}60)` }}
+          style={{ transition: 'all 0.3s ease', filter: `drop-shadow(0 0 6px ${color}60)` }}
         />
 
         {/* Center dot */}
-        <circle cx={cx} cy={cy} r={8} fill={color} style={{ filter: `drop-shadow(0 0 6px ${color}60)` }} />
-        <circle cx={cx} cy={cy} r={4} fill="#0F0F14" />
+        <circle cx={cx} cy={cy} r={8} fill={color} style={{ filter: `drop-shadow(0 0 8px ${color}60)` }} />
+        <circle cx={cx} cy={cy} r={4} fill="#0A0A0F" />
       </svg>
 
       {/* Score display */}
       <div className="flex flex-col items-center -mt-4">
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-black tracking-tight" style={{ color }}>
+          <span className="text-5xl font-black tracking-tight font-mono" style={{ color }}>
             {animatedScore}
           </span>
-          <span className="text-lg font-semibold text-slate-500">/100</span>
+          <span className="text-lg font-semibold text-[#5A5A6E]">/100</span>
         </div>
 
         <div className="flex items-center gap-2 mt-2">
@@ -199,7 +199,7 @@ export default function RiskGauge({ score: propScore, size = 280 }) {
 
         {/* Trend indicator */}
         {trendDelta !== 0 && (
-          <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${trendDelta > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+          <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${trendDelta > 0 ? 'text-[#FF3B3B]' : 'text-[#00D26A]'}`}>
             {trendDelta > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
             {trendDelta > 0 ? '+' : ''}{Math.round(trendDelta)} from yesterday
           </div>

@@ -211,11 +211,11 @@ def save_mock_data(filepath: str = None) -> str:
 
     df = generate_mock_trades()
     df.to_csv(filepath, index=False)
-    print(f"✅ Generated {len(df)} mock trades → {filepath}")
+    print(f"Generated {len(df)} mock trades -> {filepath}")
 
     # Print summary stats
     pattern_counts = df["behavioral_pattern"].value_counts()
-    print("\n📊 Pattern Distribution:")
+    print("\nPattern Distribution:")
     for pattern, count in pattern_counts.items():
         win_count = len(df[(df["behavioral_pattern"] == pattern) & (df["outcome"] == "WIN")])
         win_rate = win_count / count * 100
@@ -223,9 +223,9 @@ def save_mock_data(filepath: str = None) -> str:
 
     total_pnl = df["pnl"].sum()
     emotional_pnl = df[df["behavioral_pattern"] != "normal"]["pnl"].sum()
-    print(f"\n💰 Total P&L: ₹{total_pnl:,.2f}")
-    print(f"😰 Emotional Trade P&L: ₹{emotional_pnl:,.2f}")
-    print(f"📈 Recoverable if emotional trades avoided: ₹{abs(emotional_pnl):,.2f}")
+    print(f"\nTotal P&L: Rs {total_pnl:,.2f}")
+    print(f"Emotional Trade P&L: Rs {emotional_pnl:,.2f}")
+    print(f"Recoverable if emotional trades avoided: Rs {abs(emotional_pnl):,.2f}")
 
     return filepath
 

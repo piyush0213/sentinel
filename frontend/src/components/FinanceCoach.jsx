@@ -125,21 +125,21 @@ export default function FinanceCoach() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Bot size={20} className="text-white" />
+          <div className="w-10 h-10 rounded-xl bg-[#111118] border border-[#1E1E2A] flex items-center justify-center">
+            <Bot size={18} className="text-[#00D26A]" />
           </div>
           <div>
             <h2 className="text-base font-bold text-white">AI Finance Coach</h2>
-            <p className="text-xs text-emerald-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <p className="text-xs text-[#00D26A] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00D26A] pulse-subtle" />
               Online
             </p>
           </div>
         </div>
         {apiKeyMissing && (
-          <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">
-            <AlertCircle size={12} />
-            Demo mode (no API key)
+          <div className="flex items-center gap-1.5 text-xs text-[#FFB020] bg-[#FFB020]/8 px-3 py-1.5 rounded-lg border border-[#FFB020]/15">
+            <AlertCircle size={11} />
+            Demo mode
           </div>
         )}
       </div>
@@ -148,19 +148,19 @@ export default function FinanceCoach() {
       <div className="flex-1 overflow-y-auto space-y-4 pr-2 pb-4">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} fade-in-up`}
-            style={{ animationDelay: `${i * 50}ms` }}>
+            style={{ animationDelay: `${i * 40}ms` }}>
             <div className="flex items-start gap-2 max-w-[85%]">
               {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-lg bg-indigo-500/20 flex items-center justify-center shrink-0 mt-1">
-                  <Sparkles size={13} className="text-indigo-400" />
+                <div className="w-7 h-7 rounded-lg bg-[#00D26A]/10 flex items-center justify-center shrink-0 mt-1">
+                  <Sparkles size={12} className="text-[#00D26A]" />
                 </div>
               )}
               <div className={msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}>
                 <div className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</div>
               </div>
               {msg.role === 'user' && (
-                <div className="w-7 h-7 rounded-lg bg-indigo-500/30 flex items-center justify-center shrink-0 mt-1">
-                  <User size={13} className="text-indigo-300" />
+                <div className="w-7 h-7 rounded-lg bg-[#1A1A24] border border-[#1E1E2A] flex items-center justify-center shrink-0 mt-1">
+                  <User size={12} className="text-[#8B8B9E]" />
                 </div>
               )}
             </div>
@@ -170,8 +170,8 @@ export default function FinanceCoach() {
         {/* Typing indicator */}
         {isTyping && (
           <div className="flex items-start gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 flex items-center justify-center shrink-0 mt-1">
-              <Sparkles size={13} className="text-indigo-400" />
+            <div className="w-7 h-7 rounded-lg bg-[#00D26A]/10 flex items-center justify-center shrink-0 mt-1">
+              <Sparkles size={12} className="text-[#00D26A]" />
             </div>
             <div className="chat-bubble-ai py-3 px-4">
               <div className="flex gap-1">
@@ -191,7 +191,7 @@ export default function FinanceCoach() {
         <div className="flex flex-wrap gap-2 mb-3">
           {SUGGESTED_QUESTIONS.map((q, i) => (
             <button key={i} onClick={() => sendMessage(q.text)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] bg-[#1A1A24] text-slate-400 hover:text-indigo-300 hover:border-indigo-500/30 transition flex items-center gap-1.5">
+              className="text-xs px-3 py-1.5 rounded-lg border border-[#1E1E2A] bg-[#111118] text-[#8B8B9E] hover:text-[#F0F0F5] hover:border-[#00D26A]/20 transition flex items-center gap-1.5">
               <span>{q.emoji}</span> {q.text}
             </button>
           ))}
@@ -199,19 +199,19 @@ export default function FinanceCoach() {
       )}
 
       {/* Input */}
-      <div className="flex items-center gap-3 bg-[#1A1A24] border border-[#2A2A3A] rounded-xl px-4 py-2">
+      <div className="flex items-center gap-3 bg-[#111118] border border-[#1E1E2A] rounded-xl px-4 py-2 focus-within:border-[#00D26A]/25 transition-colors">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask me anything about trading..."
-          className="flex-1 bg-transparent text-sm text-slate-200 placeholder-slate-600 outline-none"
+          className="flex-1 bg-transparent text-sm text-[#F0F0F5] placeholder-[#5A5A6E] outline-none"
           disabled={isTyping}
         />
         <button onClick={() => sendMessage()} disabled={!input.trim() || isTyping}
-          className="w-9 h-9 rounded-lg bg-indigo-500 hover:bg-indigo-400 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed">
-          {isTyping ? <Loader2 size={16} className="text-white animate-spin" /> : <Send size={16} className="text-white" />}
+          className="w-8 h-8 rounded-lg bg-[#00D26A] hover:bg-[#00D26A]/80 flex items-center justify-center transition disabled:opacity-25 disabled:cursor-not-allowed">
+          {isTyping ? <Loader2 size={14} className="text-[#0A0A0F] animate-spin" /> : <Send size={14} className="text-[#0A0A0F]" />}
         </button>
       </div>
     </div>

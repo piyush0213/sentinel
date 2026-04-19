@@ -9,9 +9,9 @@ import { Shield, AlertTriangle, CheckCircle, XCircle, Loader2, Search, ExternalL
 import axios from 'axios';
 
 const RISK_STYLES = {
-  HIGH: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', badge: 'bg-red-500/20 text-red-400 border-red-500/30' },
-  MEDIUM: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', badge: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-  LOW: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  HIGH: { bg: 'bg-[#FF3B3B]/5', border: 'border-[#FF3B3B]/20', text: 'text-[#FF3B3B]', badge: 'bg-[#FF3B3B]/12 text-[#FF3B3B] border-[#FF3B3B]/20' },
+  MEDIUM: { bg: 'bg-[#FFB020]/5', border: 'border-[#FFB020]/20', text: 'text-[#FFB020]', badge: 'bg-[#FFB020]/12 text-[#FFB020] border-[#FFB020]/20' },
+  LOW: { bg: 'bg-[#00D26A]/5', border: 'border-[#00D26A]/20', text: 'text-[#00D26A]', badge: 'bg-[#00D26A]/12 text-[#00D26A] border-[#00D26A]/20' },
 };
 
 const FLAG_ICONS = {
@@ -101,12 +101,12 @@ export default function MisinfoShield() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center mb-2">
-        <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-4">
-          <Shield size={14} className="text-indigo-400" />
-          <span className="text-xs text-indigo-300 font-semibold tracking-wider uppercase">Misinformation Shield</span>
+        <div className="inline-flex items-center gap-2 bg-[#00D26A]/8 border border-[#00D26A]/15 rounded-full px-4 py-1.5 mb-4">
+          <Shield size={13} className="text-[#00D26A]" />
+          <span className="text-[10px] text-[#00D26A] font-bold tracking-widest uppercase">Misinformation Shield</span>
         </div>
         <h2 className="text-2xl font-bold text-white">Analyze a Stock Tip</h2>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="text-sm text-[#5A5A6E] mt-1">
           Paste any stock tip you received — we'll check it for scam patterns
         </p>
       </div>
@@ -117,12 +117,12 @@ export default function MisinfoShield() {
           value={tipText}
           onChange={(e) => setTipText(e.target.value)}
           placeholder="E.g. 'Buy XYZ stock now!! Will 10x in 2 weeks. Guaranteed profits. Trusted source. Act fast before it's too late!'"
-          className="w-full h-36 bg-[#0F0F14] border border-[#2A2A3A] rounded-xl p-4 text-sm text-slate-200 placeholder-slate-600 resize-none focus:outline-none focus:border-indigo-500/50 transition"
+          className="w-full h-36 bg-[#0A0A0F] border border-[#1E1E2A] rounded-xl p-4 text-sm text-[#F0F0F5] placeholder-[#5A5A6E] resize-none focus:outline-none focus:border-[#00D26A]/30 transition"
         />
         <div className="flex items-center justify-between mt-4">
-          <span className="text-xs text-slate-500">{tipText.length} characters</span>
+          <span className="text-[10px] text-[#5A5A6E] font-mono">{tipText.length} characters</span>
           <button onClick={analyzeTip} disabled={!tipText.trim() || loading} className="btn-primary flex items-center gap-2">
-            {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+            {loading ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
             Analyze Tip
           </button>
         </div>
@@ -130,11 +130,11 @@ export default function MisinfoShield() {
 
       {/* Example tips */}
       <div>
-        <p className="text-xs text-slate-500 font-medium mb-2 uppercase tracking-wider">Try an example:</p>
+        <p className="text-[10px] text-[#5A5A6E] font-semibold mb-2.5 uppercase tracking-widest">Try an example</p>
         <div className="flex flex-wrap gap-2">
           {examples.map((ex, i) => (
             <button key={i} onClick={() => loadExample(ex)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] bg-[#1A1A24] text-slate-400 hover:text-slate-200 hover:border-indigo-500/30 transition">
+              className="text-xs px-3 py-1.5 rounded-lg border border-[#1E1E2A] bg-[#111118] text-[#8B8B9E] hover:text-[#F0F0F5] hover:border-[#2A2A3A] transition">
               {ex.label}
             </button>
           ))}
@@ -147,34 +147,34 @@ export default function MisinfoShield() {
           {/* Risk level badge */}
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              {result.risk_level === 'HIGH' && <XCircle size={24} className="text-red-400" />}
-              {result.risk_level === 'MEDIUM' && <AlertTriangle size={24} className="text-amber-400" />}
-              {result.risk_level === 'LOW' && <CheckCircle size={24} className="text-emerald-400" />}
+              {result.risk_level === 'HIGH' && <XCircle size={22} className="text-[#FF3B3B]" />}
+              {result.risk_level === 'MEDIUM' && <AlertTriangle size={22} className="text-[#FFB020]" />}
+              {result.risk_level === 'LOW' && <CheckCircle size={22} className="text-[#00D26A]" />}
               <div>
                 <span className={`text-xs font-bold uppercase tracking-widest ${style.text}`}>
                   {result.risk_level} RISK
                 </span>
-                <div className="w-32 h-1.5 bg-[#0F0F14] rounded-full mt-1.5 overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-1000 ${result.risk_level === 'HIGH' ? 'bg-red-500' : result.risk_level === 'MEDIUM' ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                <div className="w-32 h-1.5 bg-[#0A0A0F] rounded-full mt-1.5 overflow-hidden">
+                  <div className={`h-full rounded-full transition-all duration-1000 ${result.risk_level === 'HIGH' ? 'bg-[#FF3B3B]' : result.risk_level === 'MEDIUM' ? 'bg-[#FFB020]' : 'bg-[#00D26A]'}`}
                     style={{ width: `${result.score || 0}%` }} />
                 </div>
               </div>
             </div>
-            <div className={`px-3 py-1 rounded-lg border text-xs font-bold ${style.badge}`}>
-              Score: {result.score}/100
+            <div className={`px-3 py-1 rounded-lg border text-xs font-bold font-mono ${style.badge}`}>
+              {result.score}/100
             </div>
           </div>
 
           {/* Detected flags */}
           {result.flag_details?.length > 0 && (
             <div className="space-y-2 mb-5">
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Detected Red Flags</p>
+              <p className="text-[10px] text-[#5A5A6E] font-semibold uppercase tracking-widest">Detected Red Flags</p>
               {result.flag_details.map((flag, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-[#0F0F14] border border-[#2A2A3A]">
+                <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#0A0A0F] border border-[#1E1E2A]">
                   <span className="text-lg">{FLAG_ICONS[flag.flag] || '⚠️'}</span>
                   <div>
-                    <p className="text-sm font-semibold text-slate-200">{flag.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{flag.description}</p>
+                    <p className="text-sm font-semibold text-[#F0F0F5]">{flag.label}</p>
+                    <p className="text-xs text-[#5A5A6E] mt-0.5">{flag.description}</p>
                   </div>
                 </div>
               ))}
@@ -184,26 +184,26 @@ export default function MisinfoShield() {
           {/* Verdict */}
           <div className={`p-4 rounded-xl ${style.bg} border ${style.border} mb-4`}>
             <div className="flex items-center gap-2 mb-2">
-              <Info size={14} className={style.text} />
-              <p className={`text-xs font-bold uppercase tracking-wider ${style.text}`}>AI Verdict</p>
+              <Info size={13} className={style.text} />
+              <p className={`text-[10px] font-bold uppercase tracking-widest ${style.text}`}>AI Verdict</p>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">{result.verdict}</p>
+            <p className="text-sm text-[#8B8B9E] leading-relaxed">{result.verdict}</p>
           </div>
 
           {/* Recommendation */}
-          <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20">
+          <div className="p-4 rounded-xl bg-[#00D26A]/5 border border-[#00D26A]/15">
             <div className="flex items-center gap-2 mb-2">
-              <Zap size={14} className="text-indigo-400" />
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-400">What to do instead</p>
+              <Zap size={13} className="text-[#00D26A]" />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#00D26A]">What to do instead</p>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">{result.recommendation}</p>
+            <p className="text-sm text-[#8B8B9E] leading-relaxed">{result.recommendation}</p>
           </div>
 
           {/* SEBI link */}
           <div className="mt-4 text-center">
             <a href="https://scores.gov.in" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition">
-              <ExternalLink size={12} />
+              className="inline-flex items-center gap-1.5 text-xs text-[#00D26A] hover:text-[#00D26A]/80 transition font-medium">
+              <ExternalLink size={11} />
               Find a SEBI-registered advisor →
             </a>
           </div>

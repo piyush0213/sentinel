@@ -34,20 +34,31 @@ const SCENARIO_BARS = [
 
 function getBarColor(lossPct) {
   const pct = Math.abs(lossPct);
-  if (pct < 15) return '#F59E0B';
-  if (pct < 30) return '#EF4444';
-  return '#DC2626';
+  if (pct < 15) return '#FFB020';
+  if (pct < 30) return '#FF3B3B';
+  return '#DC2020';
 }
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-[#1A1A24] border border-[#2A2A3A] rounded-xl p-3 shadow-xl text-sm">
-      <p className="font-bold text-white mb-1">{d.name}</p>
-      <p className="text-slate-400">Portfolio: <span className="text-white font-semibold">{formatINR(d.value)}</span></p>
-      <p className="text-red-400">Loss: <span className="font-semibold">{d.lossPct}%</span></p>
-      <p className="text-slate-400">Recovery: <span className="text-amber-400">{d.recoveryDays} days</span></p>
+    <div className="bg-[#111118] border border-[#1E1E2A] rounded-xl p-3.5 shadow-2xl text-sm" style={{ minWidth: 180 }}>
+      <p className="font-bold text-white mb-2">{d.name}</p>
+      <div className="space-y-1.5">
+        <div className="flex justify-between">
+          <span className="text-[#5A5A6E]">Portfolio</span>
+          <span className="text-white font-semibold font-mono">{formatINR(d.value)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-[#5A5A6E]">Loss</span>
+          <span className="text-[#FF3B3B] font-bold font-mono">-{d.lossPct}%</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-[#5A5A6E]">Recovery</span>
+          <span className="text-[#FFB020] font-mono">{d.recoveryDays}d</span>
+        </div>
+      </div>
     </div>
   );
 };
@@ -105,40 +116,40 @@ export default function StressChart({ fullPage = false }) {
     : [];
 
   return (
-    <div className={`glass-card ${fullPage ? '' : ''}`}>
+    <div className="glass-card">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <TrendingDown size={16} className="text-red-400" />
-          <h3 className="text-sm font-semibold text-slate-200 tracking-wide">Portfolio Stress Test</h3>
+          <TrendingDown size={15} className="text-[#FF3B3B]" />
+          <h3 className="text-sm font-semibold text-[#F0F0F5] tracking-wide">Portfolio Stress Test</h3>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">Portfolio: {formatINR(portfolioValue)}</span>
+          <span className="text-[10px] text-[#5A5A6E] font-semibold tracking-wider uppercase">Portfolio: {formatINR(portfolioValue)}</span>
           <button onClick={runStressTest} className="btn-primary text-xs py-1.5 px-4" disabled={loading}>
-            {loading ? <Loader2 size={14} className="animate-spin" /> : 'Run Test'}
+            {loading ? <Loader2 size={13} className="animate-spin" /> : 'Run Test'}
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64 text-slate-500">
-          <Loader2 size={24} className="animate-spin mr-2" /> Running stress simulations...
+        <div className="flex items-center justify-center h-64 text-[#5A5A6E]">
+          <Loader2 size={20} className="animate-spin mr-2" /> Running stress simulations...
         </div>
       ) : (
         <>
           <div className="h-64 mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }} barCategoryGap="20%">
-                <CartesianGrid strokeDasharray="3 3" stroke="#1A1A24" vertical={false} />
-                <XAxis dataKey="shortName" tick={{ fill: '#94A3B8', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false}
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E1E2A" vertical={false} />
+                <XAxis dataKey="shortName" tick={{ fill: '#8B8B9E', fontSize: 11, fontFamily: 'Inter' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#5A5A6E', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} axisLine={false} tickLine={false}
                   tickFormatter={v => `₹${(v / 100000).toFixed(1)}L`} domain={[0, portfolioValue * 1.1]} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99,102,241,0.05)' }} />
-                <ReferenceLine y={portfolioValue} stroke="#6366F1" strokeDasharray="5 5" strokeWidth={2}
-                  label={{ value: `Current: ${formatINR(portfolioValue)}`, position: 'top', fill: '#818CF8', fontSize: 11 }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
+                <ReferenceLine y={portfolioValue} stroke="#00D26A" strokeDasharray="5 5" strokeWidth={1.5}
+                  label={{ value: `Current: ${formatINR(portfolioValue)}`, position: 'top', fill: '#00D26A', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]} cursor="pointer"
                   onClick={(entry) => setSelectedScenario(entry)}>
                   {chartData.map((entry, i) => (
-                    <Cell key={i} fill={getBarColor(entry.lossPct)} fillOpacity={0.8} />
+                    <Cell key={i} fill={getBarColor(entry.lossPct)} fillOpacity={0.85} />
                   ))}
                 </Bar>
               </BarChart>
@@ -148,18 +159,18 @@ export default function StressChart({ fullPage = false }) {
           {/* Recovery time estimates */}
           <div className="grid grid-cols-5 gap-2 mt-2">
             {chartData.map((d, i) => (
-              <div key={i} className="text-center p-2 rounded-lg bg-[#0F0F14] border border-[#2A2A3A]"
-                onClick={() => setSelectedScenario(d)} style={{ cursor: 'pointer' }}>
-                <p className="text-[10px] text-slate-500 mb-1">{d.shortName}</p>
-                <p className="text-sm font-bold text-red-400">-{d.lossPct}%</p>
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  <Clock size={9} className="text-amber-400" />
-                  <span className="text-[10px] text-amber-400">{d.recoveryDays}d</span>
+              <div key={i} className="text-center p-2.5 rounded-xl bg-[#0A0A0F] border border-[#1E1E2A] hover:border-[#2A2A3A] transition-colors cursor-pointer"
+                onClick={() => setSelectedScenario(d)}>
+                <p className="text-[10px] text-[#5A5A6E] mb-1 font-medium">{d.shortName}</p>
+                <p className="text-sm font-bold font-mono text-[#FF3B3B]">-{d.lossPct}%</p>
+                <div className="flex items-center justify-center gap-1 mt-1.5">
+                  <Clock size={9} className="text-[#FFB020]" />
+                  <span className="text-[10px] text-[#FFB020] font-mono">{d.recoveryDays}d</span>
                 </div>
                 {d.marginCall && (
                   <div className="flex items-center justify-center gap-1 mt-1">
-                    <AlertTriangle size={9} className="text-red-400" />
-                    <span className="text-[9px] text-red-400 font-bold">MARGIN CALL</span>
+                    <AlertTriangle size={8} className="text-[#FF3B3B]" />
+                    <span className="text-[8px] text-[#FF3B3B] font-bold tracking-wider">MARGIN CALL</span>
                   </div>
                 )}
               </div>
@@ -168,19 +179,19 @@ export default function StressChart({ fullPage = false }) {
 
           {/* Selected scenario detail */}
           {selectedScenario && fullPage && (
-            <div className="mt-4 p-4 rounded-xl bg-[#0F0F14] border border-[#2A2A3A] fade-in-up">
+            <div className="mt-4 p-4 rounded-xl bg-[#0A0A0F] border border-[#1E1E2A] fade-in-up">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-bold text-white">{selectedScenario.name}</h4>
-                <span className="text-xs text-red-400 font-bold">Loss: {formatINR(portfolioValue - selectedScenario.value)}</span>
+                <span className="text-xs text-[#FF3B3B] font-bold font-mono">Loss: {formatINR(portfolioValue - selectedScenario.value)}</span>
               </div>
               {selectedScenario.hedges?.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Recommended Hedges</p>
+                  <p className="text-[10px] text-[#5A5A6E] font-semibold uppercase tracking-widest">Recommended Hedges</p>
                   {selectedScenario.hedges.map((h, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <Shield size={12} className="text-indigo-400" />
-                      <span className="text-indigo-300 font-medium">{h.type}:</span>
-                      <span className="text-slate-400">{h.description}</span>
+                    <div key={i} className="flex items-center gap-2.5 text-sm p-2.5 rounded-lg bg-[#111118] border border-[#1E1E2A]">
+                      <Shield size={13} className="text-[#00D26A]" />
+                      <span className="text-[#00D26A] font-semibold text-xs">{h.type}</span>
+                      <span className="text-[#8B8B9E] text-xs">{h.description}</span>
                     </div>
                   ))}
                 </div>
